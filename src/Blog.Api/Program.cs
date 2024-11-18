@@ -1,4 +1,5 @@
 using Blog.Api;
+using Blog.Api.Filters;
 using Blog.Core.Domain.Identity;
 using Blog.Core.Models.Content;
 using Blog.Core.SeedWorks;
@@ -7,6 +8,8 @@ using Blog.Data.Repositories;
 using Blog.Data.SeedWorks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -65,7 +68,21 @@ builder.Services.AddAutoMapper(typeof(PostInListDto));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.CustomOperationIds(apiDesc =>
+    {
+        return apiDesc.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null;
+    });
+    c.SwaggerDoc("AdminAPI", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Version = "v1",
+        Title = "API for Administrators",
+        Description = "API for CMS core domain. This domain keeps track of campaigns, campaign rules, and campaign execution."
+    });
+    c.ParameterFilter<SwaggerNullableParameterFilter>();
+});
 
 var app = builder.Build();
 
