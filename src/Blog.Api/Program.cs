@@ -22,17 +22,18 @@ builder.Configuration
 var configuration = builder.Configuration;
 var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-//var TeduCorsPolicy = "TeduCorsPolicy";
+var TeduCorsPolicy = "TeduCorsPolicy";
+
 //builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 //builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
-//builder.Services.AddCors(o => o.AddPolicy(TeduCorsPolicy, builder =>
-//{
-//    builder.AllowAnyMethod()
-//        .AllowAnyHeader()
-//        .WithOrigins(configuration["AllowedOrigins"]?.Split(";"))
-//        .AllowCredentials();
-//}));
+builder.Services.AddCors(o => o.AddPolicy(TeduCorsPolicy, builder =>
+{
+    builder.AllowAnyMethod()
+        .AllowAnyHeader()
+        .WithOrigins(configuration["AllowedOrigins"]?.Split(";"))
+        .AllowCredentials();
+}));
 // Add services to the container.
 //Config DB Context and ASP.NET Core Identity
 builder.Services.AddDbContext<BlogContext>(options =>
@@ -124,6 +125,9 @@ if (app.Environment.IsDevelopment())
         c.DisplayRequestDuration();
     });
 }
+
+app.UseCors(TeduCorsPolicy);
+
 
 app.UseAuthorization();
 
