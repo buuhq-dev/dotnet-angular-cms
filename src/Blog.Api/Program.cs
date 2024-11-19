@@ -1,4 +1,5 @@
 using Blog.Api;
+using Blog.Api.Authorization;
 using Blog.Api.Filters;
 using Blog.Api.Services;
 using Blog.Core.ConfigOptions;
@@ -14,9 +15,24 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
+
 var configuration = builder.Configuration;
 var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+//var TeduCorsPolicy = "TeduCorsPolicy";
+//builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+//builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
+//builder.Services.AddCors(o => o.AddPolicy(TeduCorsPolicy, builder =>
+//{
+//    builder.AllowAnyMethod()
+//        .AllowAnyHeader()
+//        .WithOrigins(configuration["AllowedOrigins"]?.Split(";"))
+//        .AllowCredentials();
+//}));
 // Add services to the container.
 //Config DB Context and ASP.NET Core Identity
 builder.Services.AddDbContext<BlogContext>(options =>
@@ -75,6 +91,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<RoleManager<AppRole>, RoleManager<AppRole>>();
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
@@ -99,7 +116,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    //app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("AdminAPI/swagger.json", "Admin API");
+        c.DisplayOperationId();
+        c.DisplayRequestDuration();
+    });
 }
 
 app.UseAuthorization();
