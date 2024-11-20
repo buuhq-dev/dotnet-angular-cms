@@ -63,6 +63,7 @@ public class RoleController : ControllerBase
         }
         return Ok();
     }
+
     [HttpGet("{id}")]
     [Authorize(Permissions.Roles.View)]
     public async Task<ActionResult<RoleDto>> GetRoleById(Guid id)
@@ -72,6 +73,7 @@ public class RoleController : ControllerBase
             return NotFound();
         return Ok(_mapper.Map<AppRole, RoleDto>(role));
     }
+
     [HttpGet]
     [Route("paging")]
     [Authorize(Permissions.Roles.View)]
@@ -94,6 +96,7 @@ public class RoleController : ControllerBase
         };
         return Ok(paginationSet);
     }
+
     [HttpGet("all")]
     [Authorize(Permissions.Roles.View)]
     public async Task<ActionResult<List<RoleDto>>> GetAllRoles()
