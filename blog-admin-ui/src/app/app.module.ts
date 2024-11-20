@@ -43,6 +43,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { AlertService } from './shared/services/alert.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+
+import { TokenStorageService } from './shared/services/token-storage.service';
+
 const APP_CONTAINERS = [
   DefaultFooterComponent,
   DefaultHeaderComponent,
@@ -92,7 +95,8 @@ const APP_CONTAINERS = [
     Title,
     MessageService,
     AlertService,
-    AdminApiAuthApiClient
+    AdminApiAuthApiClient,
+    TokenStorageService,
   ],
   bootstrap: [AppComponent]
 })
