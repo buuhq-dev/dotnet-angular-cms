@@ -1,5 +1,5 @@
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -17,13 +17,17 @@ import { AlertService } from 'src/app/shared/services/alert.service';
 import { UrlConstants } from 'src/app/shared/constants/url.constants';
 import { TokenStorageService } from 'src/app/shared/services/token-storage.service';
 
+import { Subject, takeUntil } from 'rxjs';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy{
   loginForm: FormGroup;
+  private ngUnsubscribe = new Subject<void>();
+  loading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -38,13 +42,22 @@ export class LoginComponent {
     });
   }
 
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
+
   login() {
+    
+    this.loading = true;
     var request: LoginRequest = new LoginRequest({
       userName: this.loginForm.controls['userName'].value,
       password: this.loginForm.controls['password'].value,
     });
 
-    this.authApiClient.login(request).subscribe({
+    this.authApiClient.login(request)
+    .pipe(takeUntil(this.ngUnsubscribe))
+    .subscribe({
       next: (res: AuthenticatedResult) => {
         //Save token and refresh token to localstorage
         this.tokenSerivce.saveToken(res.token);
@@ -56,6 +69,7 @@ export class LoginComponent {
       error: (error: any) => {
         console.log(error);
         this.alertService.showError('Đăng nhập không đúng.');
+        this.loading = false;
       },
     });
   }
