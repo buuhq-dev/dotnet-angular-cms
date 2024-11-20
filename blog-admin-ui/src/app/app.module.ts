@@ -37,7 +37,7 @@ import {
 } from '@coreui/angular';
 
 import { IconModule, IconSetService } from '@coreui/icons-angular';
-import { ADMIN_API_BASE_URL, AdminApiAuthApiClient } from './api/admin-api.service.generated';
+import { ADMIN_API_BASE_URL, AdminApiAuthApiClient, AdminApiTestApiClient, AdminApiTokenApiClient } from './api/admin-api.service.generated';
 import { environment } from './../environments/environment';
 import { HttpClientModule } from '@angular/common/http';
 import { AlertService } from './shared/services/alert.service';
@@ -98,7 +98,9 @@ const APP_CONTAINERS = [
     AlertService,
     AdminApiAuthApiClient,
     TokenStorageService,
-    AuthGuard
+    AuthGuard,
+    AdminApiTestApiClient,
+    AdminApiTokenApiClient
   ],
   bootstrap: [AppComponent]
 })
