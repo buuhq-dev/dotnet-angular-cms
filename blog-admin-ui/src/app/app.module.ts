@@ -1,5 +1,9 @@
 import { NgModule } from '@angular/core';
-import { HashLocationStrategy, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import {
+  HashLocationStrategy,
+  LocationStrategy,
+  PathLocationStrategy,
+} from '@angular/common';
 import { BrowserModule, Title } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -13,7 +17,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 // Import containers
-import { DefaultFooterComponent, DefaultHeaderComponent, DefaultLayoutComponent } from './containers';
+import {
+  DefaultFooterComponent,
+  DefaultHeaderComponent,
+  DefaultLayoutComponent,
+} from './containers';
 
 import {
   AvatarModule,
@@ -37,26 +45,32 @@ import {
 } from '@coreui/angular';
 
 import { IconModule, IconSetService } from '@coreui/icons-angular';
-import { ADMIN_API_BASE_URL, AdminApiAuthApiClient, AdminApiRoleApiClient, AdminApiTestApiClient, AdminApiTokenApiClient, AdminApiUserApiClient } from './api/admin-api.service.generated';
+import {
+  ADMIN_API_BASE_URL,
+  AdminApiAuthApiClient,
+  AdminApiPostCategoryApiClient,
+  AdminApiRoleApiClient,
+  AdminApiTestApiClient,
+  AdminApiTokenApiClient,
+  AdminApiUserApiClient,
+} from './api/admin-api.service.generated';
 import { environment } from './../environments/environment';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { AlertService } from './shared/services/alert.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { AlertService } from './shared/services/alert.service';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { TokenStorageService } from './shared/services/token-storage.service';
 import { AuthGuard } from './shared/auth.guard';
-import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { TokenInterceptor } from './shared/interceptors/token.interceptor';
 import { GlobalHttpInterceptorService } from './shared/interceptors/error-handler.interceptor';
-
+import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { UtilityService } from './shared/services/utility.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 const APP_CONTAINERS = [
   DefaultFooterComponent,
   DefaultHeaderComponent,
-  DefaultLayoutComponent
+  DefaultLayoutComponent,
 ];
 
 @NgModule({
@@ -88,7 +102,6 @@ const APP_CONTAINERS = [
     ListGroupModule,
     CardModule,
     NgScrollbarModule,
-
     ToastModule,
     HttpClientModule,
     ConfirmDialogModule,
@@ -108,7 +121,7 @@ const APP_CONTAINERS = [
     },
     {
       provide: LocationStrategy,
-      useClass: HashLocationStrategy
+      useClass: HashLocationStrategy,
     },
     IconSetService,
     Title,
@@ -121,11 +134,11 @@ const APP_CONTAINERS = [
     AdminApiTokenApiClient,
     AdminApiRoleApiClient,
     AdminApiUserApiClient,
+    AdminApiPostCategoryApiClient,
     DialogService,
     UtilityService,
     ConfirmationService 
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule {}
