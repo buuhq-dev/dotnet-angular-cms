@@ -1,31 +1,37 @@
 ﻿using AutoMapper;
-using Blog.Core.Domain.Content;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Blog.Core.Domain.Content;
 
 namespace Blog.Core.Models.Content;
 
 public class CreateUpdatePostCategoryRequest
 {
     [MaxLength(250)]
-    public required string Name { set; get; }
-    [Column(TypeName = "varchar(250)")]
-    public required string Slug { set; get; }
-    public Guid? ParentId { set; get; }
-    public bool IsActive { set; get; }
-    public string? SeoKeywords { set; get; }
-    public string? SeoDescription { set; get; }
-    public int SortOrder { set; get; }
+    public required string Name { get; set; }
+
+    public required string Description { get; set; }
+
+    [MaxLength(250)]
+    public required string Slug { get; set; }
+
+    public bool IsActive { get; set; }
+    public int SortOrder { get; set; }
+
+    [MaxLength(250)]
+    public string? SeoKeywords { get; set; }
+
+    [MaxLength(250)]
+    public string? SeoDescription { get; set; }
+
+    [MaxLength(250)]
+    public string? Thumbnail { set; get; }
+
+    public string? Content { get; set; }
     public class AutoMapperProfiles : Profile
     {
         public AutoMapperProfiles()
         {
-            CreateMap<CreateUpdatePostCategoryRequest, PostCategory>();
+            CreateMap<CreateUpdateSeriesRequest, Series>();
         }
     }
 }

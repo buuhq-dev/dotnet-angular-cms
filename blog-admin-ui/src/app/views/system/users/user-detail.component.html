@@ -48,11 +48,13 @@
                 <app-validation-message [entityForm]="form" fieldName="email" [validationMessages]="validationMessages">
                 </app-validation-message>
             </div>
+
             <div class="field col-12 md:col-4">
                 <label for="dob">Ngày sinh</label>
                 <input id="dob" type="date" pInputText [pKeyFilter]="noSpecial" formControlName="dob"
                     [style]="{ width: '100%' }" />
             </div>
+
             <div class="field col-6 md:col-6">
                 <label for="avatarFile">Ảnh đại diện</label>
                 <input id="avatarFile" (change)="onFileChange($event)" type="file" [style]="{ width: '100%' }" />
@@ -60,6 +62,16 @@
                 </p-image>
             </div>
             <div class="field col-6 md:col-6">
+
+            </div>
+            <div class="field col-12 md:col-12">
+                <label for="royaltyAmountPerPost">Nhuận bút/bài</label>
+                <p-inputNumber id="royaltyAmountPerPost" formControlName="royaltyAmountPerPost"
+                    [style]="{ width: '100%' }">
+                </p-inputNumber>
+                <app-validation-message [entityForm]="form" fieldName="royaltyAmountPerPost"
+                    [validationMessages]="validationMessages">
+                </app-validation-message>
             </div>
             <div class="field-checkbox col-12 md:col-3">
                 <p-checkbox formControlName="isActive" [binary]="true" id="isActive"></p-checkbox>
@@ -71,6 +83,7 @@
                 Lưu lại
             </button>
         </ng-template>
+
         <p-blockUI [target]="pnlDetail" [blocked]="blockedPanelDetail">
             <p-progressSpinner [style]="{
                     width: '100px',

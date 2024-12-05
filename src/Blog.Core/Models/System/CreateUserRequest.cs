@@ -1,10 +1,5 @@
 ﻿using AutoMapper;
 using Blog.Core.Domain.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blog.Core.Models.System;
 
@@ -19,6 +14,8 @@ public class CreateUserRequest
     public DateTime? Dob { get; set; }
     public string? Avatar { get; set; }
     public bool IsActive { get; set; }
+    public double RoyaltyAmountPerPost { get; set; }
+
     public class AutoMapperProfiles : Profile
     {
         public AutoMapperProfiles()

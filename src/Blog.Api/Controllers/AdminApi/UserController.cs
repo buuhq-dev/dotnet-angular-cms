@@ -4,6 +4,7 @@ using Blog.Api.Filters;
 using Blog.Core.Domain.Identity;
 using Blog.Core.Models;
 using Blog.Core.Models.System;
+using Blog.Core.SeedWorks;
 using Blog.Core.SeedWorks.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,11 +20,14 @@ public class UserController : ControllerBase
 {
     private readonly IMapper _mapper;
     private readonly UserManager<AppUser> _userManager;
-    public UserController(UserManager<AppUser> userManager, IMapper mapper)
+    private readonly IUnitOfWork _unitOfWork;
+    public UserController(UserManager<AppUser> userManager, IMapper mapper, IUnitOfWork unitOfWork)
     {
         _mapper = mapper;
         _userManager = userManager;
+        _unitOfWork = unitOfWork;
     }
+
     [HttpGet("{id}")]
     [Authorize(Users.View)]
     public async Task<ActionResult<UserDto>> GetUserById(Guid id)
@@ -51,10 +55,13 @@ public class UserController : ControllerBase
                                      || x.Email.Contains(keyword)
                                      || x.PhoneNumber.Contains(keyword));
         }
+
         var totalRow = await query.CountAsync();
+
         query = query.OrderByDescending(x => x.DateCreated)
            .Skip((pageIndex - 1) * pageSize)
            .Take(pageSize);
+
         var pagedResponse = new PagedResult<UserDto>
         {
             Results = await _mapper.ProjectTo<UserDto>(query).ToListAsync(),
@@ -74,16 +81,19 @@ public class UserController : ControllerBase
         {
             return BadRequest();
         }
+
         if ((await _userManager.FindByEmailAsync(request.Email)) != null)
         {
             return BadRequest();
         }
         var user = _mapper.Map<CreateUserRequest, AppUser>(request);
         var result = await _userManager.CreateAsync(user, request.Password);
+
         if (result.Succeeded)
         {
             return Ok();
         }
+
         return BadRequest(string.Join("<br>", result.Errors.Select(x => x.Description)));
     }
 
@@ -99,6 +109,7 @@ public class UserController : ControllerBase
         }
         _mapper.Map(request, user);
         var result = await _userManager.UpdateAsync(user);
+
         if (!result.Succeeded)
         {
             return BadRequest(string.Join("<br>", result.Errors.Select(x => x.Description)));
@@ -138,6 +149,7 @@ public class UserController : ControllerBase
         }
         return Ok();
     }
+
 
     [HttpPost("set-password/{id}")]
     [Authorize(Users.Edit)]
@@ -186,15 +198,14 @@ public class UserController : ControllerBase
             return NotFound();
         }
         var currentRoles = await _userManager.GetRolesAsync(user);
-        var removedResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+        await _unitOfWork.Users.RemoveUserFromRoles(user.Id, currentRoles.ToArray());
         var addedResult = await _userManager.AddToRolesAsync(user, roles);
-        if (!addedResult.Succeeded || !removedResult.Succeeded)
+        if (!addedResult.Succeeded)
         {
             List<IdentityError> addedErrorList = addedResult.Errors.ToList();
-            List<IdentityError> removedErrorList = removedResult.Errors.ToList();
             var errorList = new List<IdentityError>();
             errorList.AddRange(addedErrorList);
-            errorList.AddRange(removedErrorList);
+
             return BadRequest(string.Join("<br/>", errorList.Select(x => x.Description)));
         }
         return Ok();

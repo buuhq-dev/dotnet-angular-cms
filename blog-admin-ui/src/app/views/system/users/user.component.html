@@ -36,6 +36,7 @@
             <th>Email</th>
             <th>Số ĐT</th>
             <th>Ngày tham gia</th>
+            <th>Số dư</th>
             <th style="width: 150px">Trạng thái</th>
             <th></th>
           </tr>
@@ -51,6 +52,7 @@
             <td>{{ row.email }}</td>
             <td>{{ row.phoneNumber }}</td>
             <td>{{ row.dateCreated | date: 'dd-MM-yyyy hh:mm' }}</td>
+            <td>{{ row.balance | number}}</td>
             <td style="width: 150px">
               <p-badge *ngIf="row.isActive == 1" value="Kích hoạt" severity="success"></p-badge>
               <p-badge *ngIf="row.isActive == 0" value="Khoá" severity="danger"></p-badge>
@@ -60,6 +62,7 @@
                 class="p-button-rounded p-button-text" (click)="setPassword(row.id)"></button>
               <button pButton pRipple type="button" icon="pi pi-envelope" pTooltip="Đặt Email" tooltipPosition="top"
                 (click)="changeEmail(row.id)" class="p-button-rounded p-button-text"></button>
+
               <button pButton pRipple type="button" icon="pi pi-users" pTooltip="Gán vai trò" tooltipPosition="top"
                 (click)="assignRole(row.id)" class="p-button-rounded p-button-text"></button>
             </td>
@@ -70,8 +73,10 @@
         </ng-template>
       </p-table>
     </div>
+
     <p-paginator [rows]="pageSize" [totalRecords]="totalCount" (onPageChange)="pageChanged($event)"
       [rowsPerPageOptions]="[10, 20, 50, 100]"></p-paginator>
+
     <p-blockUI [target]="pnl" [blocked]="blockedPanel">
       <p-progressSpinner [style]="{ width: '100px', height: '100px', position: 'absolute', top: '25%', left: '50%' }"
         strokeWidth="2" animationDuration=".5s"></p-progressSpinner>

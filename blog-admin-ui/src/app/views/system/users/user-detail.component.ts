@@ -6,13 +6,12 @@ import { UtilityService } from 'src/app/shared/services/utility.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { formatDate } from '@angular/common';
 import { AdminApiRoleApiClient, AdminApiUserApiClient, RoleDto, UserDto } from 'src/app/api/admin-api.service.generated';
-
-
 @Component({
   templateUrl: 'user-detail.component.html',
 })
 export class UserDetailComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
+
   // Default
   public blockedPanelDetail: boolean = false;
   public form: FormGroup;
@@ -22,7 +21,9 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   public roles: any[] = [];
   selectedEntity = {} as UserDto;
   public avatarImage;
+
   formSavedEventEmitter: EventEmitter<any> = new EventEmitter();
+
   constructor(
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig,
@@ -54,7 +55,10 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       },
     ],
     phoneNumber: [{ type: 'required', message: 'Bạn phải nhập số điện thoại' }],
+    royaltyAmountPerPost: [{ type: 'required', message: 'Bạn phải nhập nhuận bút' }],
+
   };
+
   ngOnInit() {
     //Init form
     this.buildForm();
@@ -75,6 +79,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
               label: element.name,
             });
           });
+
           if (this.utilService.isEmpty(this.config.data?.id) == false) {
             this.loadFormDetails(this.config.data?.id);
           } else {
@@ -96,6 +101,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
           this.selectedEntity = response;
           this.buildForm();
           this.setMode('update');
+
           this.toggleBlockUI(false);
         },
         error: () => {
@@ -103,8 +109,10 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         },
       });
   }
+
   onFileChange(event) {
     const reader = new FileReader();
+
     if (event.target.files && event.target.files.length) {
       const [file] = event.target.files;
       reader.readAsDataURL(file);
@@ -113,6 +121,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
           avatarFileName: file.name,
           avatarFileContent: reader.result,
         });
+
         // need to run CD since file load runs outside of zone
         this.cd.markForCheck();
       };
@@ -120,8 +129,10 @@ export class UserDetailComponent implements OnInit, OnDestroy {
   }
   saveChange() {
     this.toggleBlockUI(true);
+
     this.saveData();
   }
+
   private saveData() {
     this.toggleBlockUI(true);
     console.log(this.form.value);
@@ -145,6 +156,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
         .subscribe({
           next: () => {
             this.toggleBlockUI(false);
+
             this.ref.close(this.form.value);
           },
           error: () => {
@@ -164,6 +176,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       }, 1000);
     }
   }
+
   setMode(mode: string) {
     if (mode == 'update') {
       this.form.controls['userName'].clearValidators();
@@ -203,6 +216,7 @@ export class UserDetailComponent implements OnInit, OnDestroy {
       avatarFile: new FormControl(null),
       avatar: new FormControl(this.selectedEntity.avatar || null),
       isActive: new FormControl(this.selectedEntity.isActive || true),
+      royaltyAmountPerPost: new FormControl(this.selectedEntity.royaltyAmountPerPost || 0, Validators.required)
     });
   }
 }

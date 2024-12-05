@@ -5,11 +5,6 @@ using Blog.Core.Models;
 using Blog.Core.Repositories;
 using Blog.Data.SeedWorks;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blog.Data.Repositories;
 
@@ -29,9 +24,11 @@ public class PostCategoryRepository : RepositoryBase<PostCategory, Guid>, IPostC
             query = query.Where(x => x.Name.Contains(keyword));
         }
         var totalRow = await query.CountAsync();
+
         query = query.OrderByDescending(x => x.DateCreated)
            .Skip((pageIndex - 1) * pageSize)
            .Take(pageSize);
+
         return new PagedResult<PostCategoryDto>
         {
             Results = await _mapper.ProjectTo<PostCategoryDto>(query).ToListAsync(),
@@ -39,5 +36,10 @@ public class PostCategoryRepository : RepositoryBase<PostCategory, Guid>, IPostC
             RowCount = totalRow,
             PageSize = pageSize
         };
+    }
+
+    public async Task<bool> HasPost(Guid categoryId)
+    {
+        return await _context.Posts.AnyAsync(x => x.CategoryId == categoryId);
     }
 }
