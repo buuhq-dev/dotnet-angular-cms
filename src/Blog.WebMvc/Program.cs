@@ -1,5 +1,6 @@
 using Blog.Core.ConfigOptions;
 using Blog.Core.Domain.Identity;
+using Blog.Core.Events.LoginSuccessed;
 using Blog.Core.Models.Content;
 using Blog.Core.SeedWorks;
 using Blog.Data;
@@ -12,10 +13,10 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration;
+
 var connectionString = configuration.GetConnectionString("DefaultConnection");
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                       .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
-
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -25,6 +26,7 @@ builder.Services.Configure<SystemConfig>(configuration.GetSection("SystemConfig"
 
 builder.Services.AddDbContext<BlogContext>(options => options.UseSqlServer(connectionString));
 
+#region Configure Identity
 builder.Services.AddIdentity<AppUser, AppRole>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<BlogContext>()
                   .AddDefaultTokenProviders();
@@ -38,26 +40,33 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 6;
     options.Password.RequiredUniqueChars = 1;
+
     // Lockout settings.
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = false;
+
     // User settings.
     options.User.AllowedUserNameCharacters =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 });
 
-// Add services to the container.
-builder.Services.AddScoped(typeof(IRepository<,>), typeof(RepositoryBase<,>));
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-builder.Services.AddAutoMapper(typeof(PostInListDto));
-
 builder.Services.AddScoped<SignInManager<AppUser>, SignInManager<AppUser>>();
 builder.Services.AddScoped<UserManager<AppUser>, UserManager<AppUser>>();
 builder.Services.AddScoped<RoleManager<AppRole>, RoleManager<AppRole>>();
 
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<AppUser>,
+   CustomClaimsPrincipalFactory>();
+#endregion
+
+builder.Services.AddAutoMapper(typeof(PostInListDto));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginSuccessedEvent).Assembly));
+
+#region Configure Services
+// Add services to the container.
+builder.Services.AddScoped(typeof(IRepository<,>), typeof(RepositoryBase<,>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // Business services and repositories
 var services = typeof(PostRepository).Assembly.GetTypes()
     .Where(x => x.GetInterfaces().Any(i => i.Name == typeof(IRepository<,>).Name)
@@ -73,8 +82,7 @@ foreach (var service in services)
     }
 }
 
-builder.Services.AddScoped<IUserClaimsPrincipalFactory<AppUser>,
-   CustomClaimsPrincipalFactory>();
+#endregion
 
 //Start pipeline
 var app = builder.Build();

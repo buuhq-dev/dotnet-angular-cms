@@ -1,6 +1,9 @@
 ﻿using Blog.Core.Domain.Identity;
+using Blog.Core.Events.LoginSuccessed;
+using Blog.Core.Events.RegisterSuccessed;
 using Blog.Core.SeedWorks.Constants;
 using Blog.WebMvc.Models;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,15 +14,17 @@ public class AuthController : Controller
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signInManager;
+    private readonly IMediator _mediator;
     public AuthController(UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager)
+        SignInManager<AppUser> signInManager, IMediator mediator)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _mediator = mediator;
     }
 
     [HttpGet]
-    [Route("/register")]
+    [Route("register")]
     public IActionResult Register()
     {
         return View();
@@ -47,6 +52,7 @@ public class AuthController : Controller
         {
             var user = await _userManager.FindByNameAsync(model.Email);
             await _signInManager.SignInAsync(user, true);
+            await _mediator.Publish(new RegisterSuccessedEvent(model.Email));
             return Redirect(UrlConsts.Profile);
         }
         else
@@ -55,6 +61,46 @@ public class AuthController : Controller
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
+        }
+        return View();
+    }
+
+    [HttpGet]
+    [Route("login")]
+    public IActionResult Login()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    [Route("login")]
+    public async Task<IActionResult> Login([FromForm] LoginViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View();
+        }
+        var user = await _userManager.FindByNameAsync(model.Email);
+        if (user == null)
+        {
+            ModelState.AddModelError(string.Empty, "Email not found!");
+            return View();
+        }
+
+        var result = await _signInManager.PasswordSignInAsync(user, model.Password, true, true);
+
+        if (result.Succeeded)
+        {
+            await _signInManager.SignInAsync(user, false);
+            await _mediator.Publish(new LoginSuccessedEvent(model.Email));
+
+            return Redirect(UrlConsts.Profile);
+        }
+        else
+        {
+            ModelState.AddModelError(string.Empty, "Login failed");
         }
         return View();
     }
