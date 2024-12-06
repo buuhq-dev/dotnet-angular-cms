@@ -1,32 +1,38 @@
+using Blog.Core.SeedWorks;
 using Blog.WebMvc.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace Blog.WebMvc.Controllers
+namespace Blog.WebMvc.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly ILogger<HomeController> _logger;
+    private readonly IUnitOfWork _unitOfWork;
+
+    public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
     {
-        private readonly ILogger<HomeController> _logger;
+        _logger = logger;
+        _unitOfWork = unitOfWork;
+    }
 
-        public HomeController(ILogger<HomeController> logger)
+    public async Task<IActionResult> Index()
+    {
+        var viewModel = new HomeViewModel()
         {
-            _logger = logger;
-        }
+            LatestPosts = await _unitOfWork.Posts.GetLatestPublishPost(10)
+        };
+        return View(viewModel);
+    }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+    public IActionResult Privacy()
+    {
+        return View();
+    }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
