@@ -7,6 +7,8 @@ add-migration Initial01
 add-migration AddPostFields
 add-migration MigrationL320
 
+add-migration AddSlugToTag
+
 update-database
 
 yarn add nswag

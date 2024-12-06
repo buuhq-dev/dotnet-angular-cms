@@ -9,6 +9,7 @@ public interface IUnitOfWork
     ISeriesRepository Series { get; }
     ITransactionRepository Transactions { get; }
     IUserRepository Users { get; }
+    ITagRepository Tags { get; }
 
     Task<int> CompleteAsync();
 }
