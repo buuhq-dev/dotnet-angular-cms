@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Handlebars.Net" Version="2.1.6" />
+    <PackageReference Include="MailKit" Version="4.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Blog.Core\Blog.Core.csproj" />
     <ProjectReference Include="..\Blog.Data\Blog.Data.csproj" />
   </ItemGroup>
